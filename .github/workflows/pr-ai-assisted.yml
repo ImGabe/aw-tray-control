@@ -1,0 +1,51 @@
+name: PR AI Assistance Check
+
+on:
+  pull_request_target:
+    types: [opened, edited, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  ai-assisted-required:
+    name: require AI-assisted disclosure
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate PR body AI section
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.pull_request.body || "";
+
+            const hasNo = /-\s*\[x\]\s*No AI tools were used/i.test(body);
+            const hasYes = /-\s*\[x\]\s*Yes, AI tools were used/i.test(body);
+
+            if ((hasNo && hasYes) || (!hasNo && !hasYes)) {
+              core.setFailed(
+                "PR must select exactly one AI Assistance option: 'No AI tools were used' or 'Yes, AI tools were used'."
+              );
+              return;
+            }
+
+            if (hasYes) {
+              const toolsMatch = body.match(/-\s*Tool\(s\):\s*(.+)/i);
+              const scopeMatch = body.match(/-\s*Scope\s*\(code\/docs\/tests\/other\):\s*(.+)/i);
+              const verifyMatch = body.match(/-\s*Human verification performed:\s*(.+)/i);
+
+              const tools = toolsMatch ? toolsMatch[1].trim() : "";
+              const scope = scopeMatch ? scopeMatch[1].trim() : "";
+              const verify = verifyMatch ? verifyMatch[1].trim() : "";
+
+              const invalidValues = ["", "n/a", "na", "none", "-"];
+              if (
+                invalidValues.includes(tools.toLowerCase()) ||
+                invalidValues.includes(scope.toLowerCase()) ||
+                invalidValues.includes(verify.toLowerCase())
+              ) {
+                core.setFailed(
+                  "When AI usage is marked as 'Yes', Tool(s), Scope, and Human verification performed must be filled with meaningful values."
+                );
+              }
+            }
