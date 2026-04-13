@@ -24,6 +24,9 @@ pub enum AppError {
     #[error("Another aw-tray-control instance is already running.")]
     AlreadyRunning,
 
+    #[error("Tray service error: {0}")]
+    Tray(#[from] ksni::Error),
+
     #[error("I/O error: {0}")]
     Io(#[from] std::io::Error),
 }

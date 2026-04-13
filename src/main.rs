@@ -7,6 +7,7 @@ mod tray;
 use directories::ProjectDirs;
 use error::AppError;
 use fs2::FileExt;
+use ksni::blocking::TrayMethods;
 use std::fs::{self, OpenOptions};
 use std::sync::{
     atomic::{AtomicBool, Ordering},
@@ -43,7 +44,7 @@ struct AppRuntime {
     _instance_lock: InstanceLock,
     term_flag: Arc<AtomicBool>,
     tray_shutdown_flag: Arc<AtomicBool>,
-    tray_handle: ksni::Handle<tray::AwTray>,
+    tray_handle: ksni::blocking::Handle<tray::AwTray>,
     health_thread: Option<JoinHandle<()>>,
 }
 
@@ -77,9 +78,7 @@ impl AppRuntime {
             Arc::clone(&tray_shutdown_flag),
         );
 
-        let tray_service = ksni::TrayService::new(tray);
-        let tray_handle = tray_service.handle();
-        tray_service.spawn();
+        let tray_handle = tray.spawn()?;
 
         let health_tray_handle = tray_handle.clone();
         let health_term_flag = Arc::clone(&term_flag);
@@ -91,7 +90,7 @@ impl AppRuntime {
                 && !health_tray_shutdown_flag.load(Ordering::Relaxed)
             {
                 thread::sleep(health_check_interval);
-                health_tray_handle.update(|tray| tray.refresh_health());
+                let _ = health_tray_handle.update(|tray: &mut tray::AwTray| tray.refresh_health());
             }
         });
 
@@ -116,7 +115,7 @@ impl AppRuntime {
         log::info!("Shutting down...");
         self.tray_shutdown_flag.store(true, Ordering::Relaxed);
         self.tray_handle.update(|tray| tray.shutdown());
-        self.tray_handle.shutdown();
+        self.tray_handle.shutdown().wait();
 
         if let Some(handle) = self.health_thread.take() {
             let _ = handle.join();

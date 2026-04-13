@@ -10,6 +10,11 @@ check:
   shellcheck scripts/*.sh
   cargo test --all-targets --all-features
 
+# Install repo-local git hooks
+hooks:
+  chmod +x .githooks/pre-commit .githooks/pre-push
+  git config core.hooksPath .githooks
+
 # Format code
 fmt:
   cargo fmt --all
