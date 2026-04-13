@@ -1,0 +1,25 @@
+Source: aw-tray-control
+Section: utils
+Priority: optional
+Maintainer: Gabriel <gabe@example.com>
+Homepage: https://github.com/ImGabe/aw-tray-control
+Vcs-Git: https://github.com/ImGabe/aw-tray-control.git
+Standards-Version: 4.6.0
+Rules-Requires-Root: no
+
+Package: aw-tray-control
+Architecture: amd64 arm64
+Depends:
+ ${shlibs:Depends},
+ ${misc:Depends},
+ dbus
+Build-Depends:
+ cargo,
+ rustc,
+ pkg-config,
+ libdbus-1-dev,
+ debhelper-compat (= 13)
+Description: ActivityWatch tray icon controller for Linux
+ A lightweight system tray application that provides quick access to
+ ActivityWatch services. Enables easy tracking pause/resume directly
+ from your desktop taskbar or system tray.

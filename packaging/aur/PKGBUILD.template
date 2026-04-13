@@ -1,0 +1,48 @@
+# PKGBUILD template for AUR
+# See: https://wiki.archlinux.org/title/AUR
+# 
+# This template will be used to create the official aw-tray-control AUR package.
+# Replace placeholders with actual values when preparing for release.
+
+pkgname=aw-tray-control
+pkgver=0.1.0           # Will be auto-updated on release
+pkgrel=1
+pkgdesc="ActivityWatch tray icon controller for Linux"
+arch=('x86_64')        # Add 'aarch64' when ARM support is verified
+url="https://github.com/ImGabe/aw-tray-control"
+license=('MIT')
+depends=(
+  'dbus'              # D-Bus system daemon
+  'gcc-libs'          # Runtime dependencies
+)
+makedepends=(
+  'cargo'             # Rust compiler and package manager
+  'rust'              # Rust toolchain
+  'pkg-config'        # For system library detection
+)
+optdepends=(
+  'aylur: for gnome-shell integration example'
+)
+source=("$pkgname-$pkgver.tar.gz::https://github.com/ImGabe/$pkgname/archive/v$pkgver.tar.gz")
+sha256sums=('SKIP')   # Will be updated with actual checksum
+
+build() {
+  cd "$srcdir/$pkgname-$pkgver"
+  cargo build --release --locked
+}
+
+package() {
+  cd "$srcdir/$pkgname-$pkgver"
+  
+  # Install binary
+  install -Dm755 target/release/aw-tray-control "$pkgdir/usr/bin/aw-tray-control"
+  
+  # Install desktop entry
+  install -Dm644 "resources/de.gabe.aw-tray-control.desktop" \
+    "$pkgdir/usr/share/applications/de.gabe.aw-tray-control.desktop"
+  
+  # Install license
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}
+
+# vim: set ts=2 sw=2 et:

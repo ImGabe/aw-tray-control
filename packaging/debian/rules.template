@@ -1,0 +1,29 @@
+#!/usr/bin/make -f
+# debian/rules - Debian packaging rules for aw-tray-control
+# See debhelper(7)
+
+export DH_VERBOSE=1
+
+%:
+	dh $@ --buildsystem=cargo
+
+# Cargo options
+export CARGO_HOME=$(CURDIR)/debian/.cargo
+export RUSTFLAGS=-Clink-args=-Wl,-z,relro,-z,now
+
+override_dh_auto_build:
+	cargo build --release --locked
+
+override_dh_auto_install:
+	# Install binary
+	dh_auto_install -- --release
+	install -Dm755 target/release/aw-tray-control \
+		debian/aw-tray-control/usr/bin/aw-tray-control
+	
+	# Install desktop entry
+	install -Dm644 resources/de.gabe.aw-tray-control.desktop \
+		debian/aw-tray-control/usr/share/applications/de.gabe.aw-tray-control.desktop
+
+override_dh_auto_test:
+	# Skip tests during build if needed
+	# dh_auto_test
