@@ -42,6 +42,7 @@ Utility entrypoint:
 
 - Source (recommended for development): `cargo run --bin aw-tray-control`
 - Local install to user binary dir: `./scripts/install-binary.sh --binary-root "$HOME/.local"`
+- Install from GitHub release tarball: `./scripts/install-from-release.sh --version 0.1.0 --autostart --force`
 - Desktop launcher + autostart: `./scripts/install-desktop-entry.sh --autostart --force`
 - Prebuilt binaries: download from [GitHub Releases](https://github.com/ImGabe/aw-tray-control/releases)
 
@@ -121,6 +122,12 @@ Current validated environment (maintainer machine):
 
 ## Troubleshooting
 
+Quick diagnostics command:
+
+```bash
+./scripts/doctor.sh
+```
+
 ### Tray icon does not appear on GNOME
 
 1. Confirm GNOME extension is installed:
@@ -167,11 +174,7 @@ cargo build --release
 ### Update from release tarball
 
 ```bash
-# Download latest tarball + .sha256 from GitHub Releases
-sha256sum -c aw-tray-control-<version>-x86_64-unknown-linux-gnu.tar.gz.sha256
-tar -xzf aw-tray-control-<version>-x86_64-unknown-linux-gnu.tar.gz
-install -Dm755 aw-tray-control "$HOME/.local/bin/aw-tray-control"
-./scripts/install-desktop-entry.sh --autostart --force --exec-path "$HOME/.local/bin/aw-tray-control"
+./scripts/install-from-release.sh --version <version> --autostart --force
 ```
 
 ## Development
@@ -180,6 +183,7 @@ Recommended flow (via `utils.sh`):
 
 ```bash
 ./scripts/utils.sh dev-check --fast
+./scripts/utils.sh doctor
 ./scripts/utils.sh dev-run --log-level debug
 ./scripts/utils.sh reinstall-local --autostart --force
 ./scripts/utils.sh uninstall --desktop-only

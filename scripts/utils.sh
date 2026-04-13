@@ -13,7 +13,9 @@ Usage:
 Commands:
   dev-check         Run local quality checks
   dev-run           Run aw-tray-control locally
+  doctor            Run environment diagnostics
   install-binary    Install binary from current repository
+  install-release   Install binary from a GitHub release tarball
   install-desktop   Install/remove desktop entry
   reinstall-local   Reinstall binary + desktop entry
   uninstall         Remove installed binary and/or desktop entries
@@ -21,7 +23,9 @@ Commands:
 
 Examples:
   scripts/utils.sh dev-check --fast
+  scripts/utils.sh doctor
   scripts/utils.sh dev-run --log-level debug
+  scripts/utils.sh install-release --version 0.1.0 --autostart --force
   scripts/utils.sh reinstall-local --autostart --force
   scripts/utils.sh uninstall --desktop-only
 
@@ -57,8 +61,14 @@ main() {
     dev-run)
       run_command "dev-run" "$@"
       ;;
+    doctor)
+      run_command "doctor" "$@"
+      ;;
     install-binary)
       run_command "install-binary" "$@"
+      ;;
+    install-release)
+      run_command "install-from-release" "$@"
       ;;
     install-desktop)
       run_command "install-desktop-entry" "$@"
