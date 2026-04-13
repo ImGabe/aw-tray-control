@@ -4,6 +4,8 @@ set -euo pipefail
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd -- "${SCRIPT_DIR}/.." && pwd)"
 SOURCE_DESKTOP_FILE="${REPO_ROOT}/desktop/aw-tray-control.desktop"
+# shellcheck source=scripts/lib.sh
+source "${SCRIPT_DIR}/lib.sh"
 
 XDG_DATA_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}"
 XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-${HOME}/.config}"
@@ -33,7 +35,7 @@ EOF
 
 require_file() {
   if [[ ! -f "${SOURCE_DESKTOP_FILE}" ]]; then
-    echo "Desktop entry not found at ${SOURCE_DESKTOP_FILE}" >&2
+    log_error "Desktop entry not found at ${SOURCE_DESKTOP_FILE}"
     exit 1
   fi
 }
@@ -45,11 +47,11 @@ maybe_overwrite() {
 
   if [[ -f "${target}" && "${force}" != "true" ]]; then
     if [[ "${dry_run}" == "true" ]]; then
-      echo "[dry-run] Target exists and would require --force: ${target}" >&2
+      log_warn "[dry-run] Target exists and would require --force: ${target}"
       return
     fi
-    echo "Target already exists: ${target}" >&2
-    echo "Use --force to overwrite." >&2
+    log_error "Target already exists: ${target}"
+    log_error "Use --force to overwrite."
     exit 1
   fi
 }
@@ -67,7 +69,7 @@ canonicalize_path() {
     return
   fi
 
-  echo "Neither realpath nor readlink is available to canonicalize paths." >&2
+  log_error "Neither realpath nor readlink is available to canonicalize paths."
   exit 1
 }
 
@@ -76,7 +78,7 @@ resolve_exec_path() {
 
   if [[ -n "${exec_path}" ]]; then
     if [[ ! -x "${exec_path}" ]]; then
-      echo "Provided --exec-path is not executable: ${exec_path}" >&2
+      log_error "Provided --exec-path is not executable: ${exec_path}"
       exit 1
     fi
     canonicalize_path "${exec_path}"
@@ -88,8 +90,8 @@ resolve_exec_path() {
     return
   fi
 
-  echo "Could not locate 'aw-tray-control' binary." >&2
-  echo "Install it on PATH (cargo install --path .) or pass --exec-path." >&2
+  log_error "Could not locate 'aw-tray-control' binary."
+  log_error "Install it on PATH (cargo install --path .) or pass --exec-path."
   exit 1
 }
 
@@ -102,16 +104,6 @@ write_desktop_file() {
     /^TryExec=/ { print "TryExec=" exec_path; next }
     { print }
   ' "${SOURCE_DESKTOP_FILE}" > "${target}"
-}
-
-run_or_echo() {
-  local dry_run="$1"
-  shift
-  if [[ "${dry_run}" == "true" ]]; then
-    echo "[dry-run] $*"
-    return
-  fi
-  "$@"
 }
 
 install_entry() {
@@ -202,7 +194,7 @@ main() {
         ;;
       --exec-path)
         if [[ $# -lt 2 ]]; then
-          echo "Missing value for --exec-path" >&2
+          log_error "Missing value for --exec-path"
           exit 1
         fi
         exec_path="$2"
@@ -213,7 +205,7 @@ main() {
         exit 0
         ;;
       *)
-        echo "Unknown option: $1" >&2
+        log_error "Unknown option: $1"
         usage
         exit 1
         ;;
@@ -221,7 +213,7 @@ main() {
   done
 
   if [[ "${remove_flag}" == "true" && "${install_autostart_flag}" == "true" ]]; then
-    echo "--remove cannot be combined with --autostart" >&2
+    log_error "--remove cannot be combined with --autostart"
     exit 1
   fi
 

@@ -38,7 +38,7 @@ main() {
     case "$1" in
       --binary-root)
         if [[ $# -lt 2 ]]; then
-          echo "Missing value for --binary-root" >&2
+          log_error "Missing value for --binary-root"
           exit 1
         fi
         binary_root="$2"
@@ -54,7 +54,7 @@ main() {
         ;;
       --exec-path)
         if [[ $# -lt 2 ]]; then
-          echo "Missing value for --exec-path" >&2
+          log_error "Missing value for --exec-path"
           exit 1
         fi
         exec_path="$2"
@@ -69,7 +69,7 @@ main() {
         exit 0
         ;;
       *)
-        echo "Unknown option: $1" >&2
+        log_error "Unknown option: $1"
         usage
         exit 1
         ;;

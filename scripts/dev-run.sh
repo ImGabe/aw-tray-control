@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=scripts/lib.sh
+source "${SCRIPT_DIR}/lib.sh"
+
 usage() {
   cat <<'EOF'
 Usage:
@@ -33,7 +37,7 @@ main() {
         ;;
       --log-level)
         if [[ $# -lt 2 ]]; then
-          echo "Missing value for --log-level" >&2
+          log_error "Missing value for --log-level"
           exit 1
         fi
         log_level="$2"
@@ -53,7 +57,7 @@ main() {
         exit 0
         ;;
       *)
-        echo "Unknown option: $1" >&2
+        log_error "Unknown option: $1"
         usage
         exit 1
         ;;
@@ -69,12 +73,7 @@ main() {
     cmd+=(-- "${app_args[@]}")
   fi
 
-  if [[ "${dry_run}" == "true" ]]; then
-    echo "[dry-run] RUST_LOG=${log_level} ${cmd[*]}"
-    exit 0
-  fi
-
-  RUST_LOG="${log_level}" "${cmd[@]}"
+  run_or_echo "${dry_run}" env "RUST_LOG=${log_level}" "${cmd[@]}"
 }
 
 main "$@"

@@ -2,7 +2,7 @@
 
 A lightweight Linux system tray controller for ActivityWatch.
 
-This app starts and supervises configured ActivityWatch-related processes, exposes a tray menu, and provides quick access to the ActivityWatch dashboard.
+It starts and supervises configured ActivityWatch processes, exposes a tray menu, and gives quick access to the dashboard.
 
 ## AI Transparency Notice
 
@@ -11,13 +11,62 @@ This project is "vibe coded": generative AI tools were used during design and im
 If you prefer not to use AI-assisted projects, please evaluate this repository before adopting it.
 All contributions are expected to be reviewed by humans for correctness, security, and license compliance.
 
-## Features
+## What You Get
 
 - Loads configuration from the XDG config directory
 - Verifies executable dependencies before startup
 - Starts and tracks managed processes
 - Exposes tray actions for opening the dashboard and stopping monitoring
 - Handles `SIGINT`/`SIGTERM` for graceful shutdown
+
+## Quick Start
+
+```bash
+cargo run --bin aw-tray-control
+```
+
+Utility entrypoint:
+
+```bash
+./scripts/utils.sh help
+```
+
+## Releases
+
+Stable builds are published in GitHub Releases as:
+
+- `aw-tray-control-<version>-x86_64-unknown-linux-gnu.tar.gz`
+- `aw-tray-control-<version>-x86_64-unknown-linux-gnu.tar.gz.sha256`
+
+Example verification flow:
+
+```bash
+sha256sum -c aw-tray-control-0.1.0-x86_64-unknown-linux-gnu.tar.gz.sha256
+tar -xzf aw-tray-control-0.1.0-x86_64-unknown-linux-gnu.tar.gz
+./aw-tray-control
+```
+
+## Requirements
+
+Minimum for local checks and scripts:
+
+- Rust toolchain (stable)
+- Bash 4+
+- `shellcheck`
+- `pkg-config`
+- `libdbus-1-dev` (or distro equivalent)
+
+For full CI-equivalent security checks (optional but recommended):
+
+- `cargo-audit`
+- `cargo-deny`
+
+Install security tools:
+
+```bash
+cargo install cargo-audit --locked --force
+cargo install cargo-deny --locked --force
+```
 
 ## Configuration
 
@@ -36,25 +85,9 @@ process_paths = [
 ]
 ```
 
-## Requirements
-
-Build and development scripts require:
-- **Bash 4.0+** (for associative arrays and modern features in `scripts/lib.sh`)
-
-Check your Bash version:
-```bash
-bash --version
-```
-
 ## Development
 
-Primary entrypoint for script utilities:
-
-```bash
-./scripts/utils.sh help
-```
-
-Recommended usage:
+Recommended flow (via `utils.sh`):
 
 ```bash
 ./scripts/utils.sh dev-check --fast
@@ -63,39 +96,31 @@ Recommended usage:
 ./scripts/utils.sh uninstall --desktop-only
 ```
 
-Legacy scripts still work, but prefer `utils.sh` for discoverability.
+Raw cargo checks:
 
 ```bash
-cargo check
 cargo fmt --all
 cargo clippy --all-targets --all-features -- -D warnings
-cargo test --all-targets --all-features
+cargo test --workspace --all-targets --all-features
+cargo check --workspace --all-targets --all-features
 ```
 
-Utility script for local validation:
-
-```bash
-./scripts/dev-check.sh
-```
-
-Options:
+Full local CI parity (when security tools are installed):
 
 ```bash
 ./scripts/dev-check.sh --fast
-./scripts/dev-check.sh --dry-run
+./scripts/dev-check.sh
+shellcheck -x scripts/*.sh
+cargo audit
+cargo deny check advisories bans sources
 ```
 
-Run utility for local execution:
+Useful direct scripts:
 
 ```bash
 ./scripts/dev-run.sh
 ./scripts/dev-run.sh --release
 ./scripts/dev-run.sh --log-level debug -- --help
-```
-
-Reinstall utility (binary + desktop entry):
-
-```bash
 ./scripts/reinstall-local.sh --force
 ./scripts/reinstall-local.sh --autostart --force
 ./scripts/reinstall-local.sh --binary-root "$HOME/.local" --autostart --force
@@ -103,48 +128,46 @@ Reinstall utility (binary + desktop entry):
 
 ## Desktop Launcher
 
-If you want to start the app again after closing it completely, a desktop
-launcher is a good Linux-native option.
+Launcher template: `desktop/aw-tray-control.desktop`
 
-A ready-to-use launcher is provided at `desktop/aw-tray-control.desktop`.
-Use the installer script:
+Install launcher:
 
 ```bash
 ./scripts/install-desktop-entry.sh
 ```
 
-This installs the launcher to `~/.local/share/applications/` (or
-`$XDG_DATA_HOME/applications` if set).
+Install launcher + autostart:
 
-The script resolves the binary path in this order:
+```bash
+./scripts/install-desktop-entry.sh --autostart --force
+```
+
+Binary resolution order:
 
 1. `--exec-path` value (if provided)
 2. `aw-tray-control` found in `PATH`
 
-You can force a specific binary path:
+Explicit binary path:
 
 ```bash
 ./scripts/install-desktop-entry.sh --exec-path "$HOME/.local/bin/aw-tray-control"
 ```
 
-Strict production flow (recommended):
+Production-like install flow:
 
 ```bash
 ./scripts/install-binary.sh
 ./scripts/install-desktop-entry.sh --autostart --force
 ```
 
-This installs the binary first, then installs desktop and autostart entries
-using the installed binary path.
-
-If you want a custom install root for the binary:
+Custom binary root:
 
 ```bash
 ./scripts/install-binary.sh --binary-root "$HOME/.local"
 ./scripts/install-desktop-entry.sh --autostart --force --exec-path "$HOME/.local/bin/aw-tray-control"
 ```
 
-Dry-run examples:
+Dry-run:
 
 ```bash
 ./scripts/install-binary.sh --dry-run
@@ -153,25 +176,25 @@ Dry-run examples:
 
 ## Uninstall
 
-Remove binary + desktop + autostart:
+Default (binary + desktop + autostart):
 
 ```bash
 ./scripts/uninstall.sh
 ```
 
-Remove only desktop/autostart entries:
+Only desktop/autostart:
 
 ```bash
 ./scripts/uninstall.sh --desktop-only
 ```
 
-Remove only binary (keep desktop/autostart):
+Only binary:
 
 ```bash
 ./scripts/uninstall.sh --keep-desktop
 ```
 
-If the binary was installed with a custom cargo root:
+Custom cargo root:
 
 ```bash
 ./scripts/uninstall.sh --binary-root "$HOME/.local"
@@ -183,16 +206,7 @@ Dry-run:
 ./scripts/uninstall.sh --dry-run
 ```
 
-The installer writes absolute `Exec` and `TryExec` paths, so desktop launch
-does not depend on terminal `PATH` after installation.
-
-If you want automatic startup on login (XDG autostart):
-
-```bash
-./scripts/install-desktop-entry.sh --autostart
-```
-
-Removal options:
+Desktop-entry removal commands:
 
 ```bash
 ./scripts/install-desktop-entry.sh --remove
@@ -204,6 +218,8 @@ Removal options:
 - Contribution guide: [CONTRIBUTING.md](./CONTRIBUTING.md)
 - Code of conduct: [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md)
 - Security policy: [SECURITY.md](./SECURITY.md)
+- Release process: [RELEASING.md](./RELEASING.md)
+- Roadmap: [ROADMAP.md](./ROADMAP.md)
 
 ## License
 

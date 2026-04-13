@@ -3,6 +3,8 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 INSTALLER_SCRIPT="${SCRIPT_DIR}/install-desktop-entry.sh"
+# shellcheck source=scripts/lib.sh
+source "${SCRIPT_DIR}/lib.sh"
 
 usage() {
   cat <<'EOF'
@@ -23,13 +25,13 @@ remove_desktop_entries() {
   local dry_run="$1"
 
   if [[ ! -x "${INSTALLER_SCRIPT}" ]]; then
-    echo "Installer script not executable: ${INSTALLER_SCRIPT}" >&2
+    log_error "Installer script not executable: ${INSTALLER_SCRIPT}"
     exit 1
   fi
 
   if [[ "${dry_run}" == "true" ]]; then
-    "${INSTALLER_SCRIPT}" --remove --dry-run
-    "${INSTALLER_SCRIPT}" --remove-autostart --dry-run
+    run_or_echo "true" "${INSTALLER_SCRIPT}" --remove --dry-run
+    run_or_echo "true" "${INSTALLER_SCRIPT}" --remove-autostart --dry-run
   else
     "${INSTALLER_SCRIPT}" --remove
     "${INSTALLER_SCRIPT}" --remove-autostart
@@ -46,14 +48,14 @@ remove_binary() {
   fi
 
   if [[ "${dry_run}" == "true" ]]; then
-    echo "[dry-run] ${cmd[*]}"
+    run_or_echo "true" "${cmd[@]}"
     return
   fi
 
   if "${cmd[@]}"; then
     echo "Removed cargo-installed binary: aw-tray-control"
   else
-    echo "Binary uninstall reported an issue. It may already be removed." >&2
+    log_warn "Binary uninstall reported an issue. It may already be removed."
   fi
 }
 
@@ -67,7 +69,7 @@ main() {
     case "$1" in
       --binary-root)
         if [[ $# -lt 2 ]]; then
-          echo "Missing value for --binary-root" >&2
+          log_error "Missing value for --binary-root"
           exit 1
         fi
         binary_root="$2"
@@ -90,7 +92,7 @@ main() {
         exit 0
         ;;
       *)
-        echo "Unknown option: $1" >&2
+        log_error "Unknown option: $1"
         usage
         exit 1
         ;;
@@ -98,7 +100,7 @@ main() {
   done
 
   if [[ "${desktop_only}" == "true" && "${keep_desktop}" == "true" ]]; then
-    echo "--desktop-only cannot be combined with --keep-desktop" >&2
+    log_error "--desktop-only cannot be combined with --keep-desktop"
     exit 1
   fi
 

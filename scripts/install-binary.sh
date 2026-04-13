@@ -3,6 +3,8 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd -- "${SCRIPT_DIR}/.." && pwd)"
+# shellcheck source=scripts/lib.sh
+source "${SCRIPT_DIR}/lib.sh"
 
 usage() {
   cat <<'EOF'
@@ -24,7 +26,7 @@ main() {
     case "$1" in
       --binary-root)
         if [[ $# -lt 2 ]]; then
-          echo "Missing value for --binary-root" >&2
+          log_error "Missing value for --binary-root"
           exit 1
         fi
         binary_root="$2"
@@ -39,7 +41,7 @@ main() {
         exit 0
         ;;
       *)
-        echo "Unknown option: $1" >&2
+        log_error "Unknown option: $1"
         usage
         exit 1
         ;;
@@ -51,12 +53,7 @@ main() {
     cmd+=(--root "${binary_root}")
   fi
 
-  if [[ "${dry_run}" == "true" ]]; then
-    echo "[dry-run] ${cmd[*]}"
-    exit 0
-  fi
-
-  "${cmd[@]}"
+  run_or_echo "${dry_run}" "${cmd[@]}"
 }
 
 main "$@"

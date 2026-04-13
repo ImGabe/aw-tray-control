@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=scripts/lib.sh
+source "${SCRIPT_DIR}/lib.sh"
+
 usage() {
   cat <<'EOF'
 Usage:
@@ -11,16 +15,6 @@ Options:
   --dry-run   Print commands without executing
   -h, --help  Show this help message
 EOF
-}
-
-run_or_echo() {
-  local dry_run="$1"
-  shift
-  if [[ "${dry_run}" == "true" ]]; then
-    echo "[dry-run] $*"
-    return
-  fi
-  "$@"
 }
 
 main() {
@@ -42,7 +36,7 @@ main() {
         exit 0
         ;;
       *)
-        echo "Unknown option: $1" >&2
+        log_error "Unknown option: $1"
         usage
         exit 1
         ;;

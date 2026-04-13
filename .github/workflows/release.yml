@@ -1,0 +1,64 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-publish:
+    name: build and publish linux binary
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pkg-config libdbus-1-dev
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo artifacts
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build release binary
+        run: cargo build --release --locked --bin aw-tray-control
+
+      - name: Package archive
+        run: |
+          set -euo pipefail
+          VERSION="${GITHUB_REF_NAME#v}"
+          mkdir -p dist
+          cp target/release/aw-tray-control dist/
+          cp README.md LICENSE dist/
+          tar -C dist -czf "aw-tray-control-${VERSION}-x86_64-unknown-linux-gnu.tar.gz" \
+            aw-tray-control README.md LICENSE
+          sha256sum "aw-tray-control-${VERSION}-x86_64-unknown-linux-gnu.tar.gz" \
+            > "aw-tray-control-${VERSION}-x86_64-unknown-linux-gnu.tar.gz.sha256"
+
+      - name: Publish GitHub release assets
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          VERSION="${GITHUB_REF_NAME#v}"
+          TAG="v${VERSION}"
+          ARCHIVE="aw-tray-control-${VERSION}-x86_64-unknown-linux-gnu.tar.gz"
+          CHECKSUM="${ARCHIVE}.sha256"
+
+          if gh release view "${TAG}" >/dev/null 2>&1; then
+            gh release upload "${TAG}" "${ARCHIVE}" "${CHECKSUM}" --clobber
+          else
+            gh release create "${TAG}" \
+              --title "${TAG}" \
+              --notes "See CHANGELOG.md for release notes." \
+              "${ARCHIVE}" "${CHECKSUM}"
+          fi
