@@ -8,10 +8,10 @@ source "${SCRIPT_DIR}/lib.sh"
 usage() {
   cat <<'EOF'
 Usage:
-  scripts/install-from-release.sh --version <semver> [options]
+  scripts/install-from-release.sh --version <semver|latest> [options]
 
 Options:
-  --version X.Y.Z      Release version to install (required)
+  --version VALUE      Release version to install (X.Y.Z, vX.Y.Z, or latest)
   --owner NAME         GitHub owner (default: ImGabe)
   --repo NAME          GitHub repo (default: aw-tray-control)
   --binary-root PATH   Install root (default: $HOME/.local)
@@ -22,8 +22,22 @@ Options:
 
 Examples:
   scripts/install-from-release.sh --version 0.1.0
+  scripts/install-from-release.sh --version v0.1.0
+  scripts/install-from-release.sh --version latest
   scripts/install-from-release.sh --version 0.1.0 --autostart --force
 EOF
+}
+
+resolve_latest_version() {
+  local owner="$1"
+  local repo="$2"
+  local api_url="https://api.github.com/repos/${owner}/${repo}/releases/latest"
+  local tag
+
+  tag="$(curl -fsSL "${api_url}" | sed -n 's/.*"tag_name"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -n1)"
+
+  [[ -n "${tag}" ]] || die "Unable to resolve latest release tag from ${api_url}"
+  echo "${tag#v}"
 }
 
 main() {
@@ -84,6 +98,13 @@ main() {
     usage
     die "--version is required"
   }
+
+  if [[ "${version}" == "latest" ]]; then
+    version="$(resolve_latest_version "${owner}" "${repo}")"
+    log_info "Resolved latest release: v${version}"
+  else
+    version="${version#v}"
+  fi
 
   local arch
   arch="$(uname -m)"
