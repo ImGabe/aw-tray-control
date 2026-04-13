@@ -40,7 +40,7 @@ jobs:
       - name: Lint shell scripts
         run: |
           shellcheck --version
-          shellcheck scripts/*.sh
+          shellcheck -x scripts/*.sh
 
   extra-checks:
     name: check, docs, security
@@ -74,13 +74,13 @@ jobs:
           key: security-tools-v1
 
       - name: Install cargo-audit
-        run: cargo install cargo-audit --locked --force-if-installed
+        run: cargo install cargo-audit --locked --force
 
       - name: Security audit
         run: cargo audit
 
       - name: Install cargo-deny
-        run: cargo install cargo-deny --locked --force-if-installed
+        run: cargo install cargo-deny --locked --force
 
       - name: Dependency and source policy checks
         run: cargo deny check advisories bans sources
