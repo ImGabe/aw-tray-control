@@ -33,6 +33,16 @@ cargo test --workspace --all-targets --all-features
 - Include rationale and testing notes in PR descriptions.
 - Update docs when behavior/config changes.
 
+## AI-Assisted Contributions Policy
+
+AI-assisted contributions are allowed, but contributors remain fully responsible for submitted content.
+
+- Disclose AI assistance in the PR description (tool name and scope, for example: code, docs, or tests).
+- Review and validate all AI-assisted changes before submission.
+- Do not submit content that copies third-party material with incompatible licensing.
+- Ensure generated code follows this project's standards, security expectations, and documentation requirements.
+- Maintainers may request revision or removal of AI-assisted content that is unclear, unsafe, or not license-compliant.
+
 ## Reporting Bugs
 
 Please include:

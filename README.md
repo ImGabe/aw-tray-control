@@ -4,6 +4,13 @@ A lightweight Linux system tray controller for ActivityWatch.
 
 This app starts and supervises configured ActivityWatch-related processes, exposes a tray menu, and provides quick access to the ActivityWatch dashboard.
 
+## AI Transparency Notice
+
+This project is "vibe coded": generative AI tools were used during design and implementation.
+
+If you prefer not to use AI-assisted projects, please evaluate this repository before adopting it.
+All contributions are expected to be reviewed by humans for correctness, security, and license compliance.
+
 ## Features
 
 - Loads configuration from the XDG config directory
