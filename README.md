@@ -110,7 +110,7 @@ Current validated environment (maintainer machine):
 - AppIndicator extension: required and installed (`appindicatorsupport@rgcjonas.gmail.com`)
 
 | Environment | Tray support | Validation level | Notes |
-| --- | --- |
+| --- | --- | --- | --- |
 | GNOME (Wayland) | Works with extension | Tested | Tested on GNOME Shell 49.5; requires AppIndicator extension |
 | GNOME (X11) | Likely works with extension | Not yet tested | Same extension requirement expected |
 | KDE Plasma | Native support | Not yet tested | Should work with StatusNotifierItem |
