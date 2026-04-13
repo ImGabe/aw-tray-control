@@ -25,7 +25,7 @@ Examples:
   scripts/utils.sh dev-check --fast
   scripts/utils.sh doctor
   scripts/utils.sh dev-run --log-level debug
-  scripts/utils.sh install-release --version 0.1.0 --autostart --force
+  scripts/utils.sh install-release --version latest --autostart --force
   scripts/utils.sh reinstall-local --autostart --force
   scripts/utils.sh uninstall --desktop-only
 

@@ -5,7 +5,23 @@ All notable changes to aw-tray-control are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.0] - 2026-04-13
+## [0.1.1] - 2026-04-13
+
+### Added
+- **Doctor Diagnostics Command:** `scripts/doctor.sh` validates environment, binary install, config, managed process paths, dashboard reachability, and GNOME AppIndicator presence.
+- **Release Installer Script:** `scripts/install-from-release.sh --version <x.y.z>` downloads release assets, verifies checksum, installs binary, and wires desktop entry/autostart.
+- **Unified Utility Commands:** `scripts/utils.sh` now exposes `doctor` and `install-release` commands for faster troubleshooting and onboarding.
+- **Just Recipes for Product Ops:** `just doctor` and `just install-release <version>` for repeatable support workflows.
+
+### Changed
+- **Troubleshooting Workflow:** README now points users to a single diagnostics command before manual debugging.
+- **Update Workflow:** README release update instructions now use the automated installer script instead of manual tar extraction steps.
+
+### Improved
+- **UX Onboarding:** New install and diagnostic paths reduce time-to-first-run and support burden for desktop integration issues.
+- **Distribution Ergonomics:** GitHub Release installation is now a first-class scripted flow with integrity verification.
+
+## [0.1.0] - 2026-04-13
 
 ### Added
 - **Typed Status API:** `ProcessStatus` enum (`Running | Stopped(ExitKind) | Error`) eliminates stringly-typed internal state
