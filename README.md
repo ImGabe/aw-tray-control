@@ -201,9 +201,9 @@ Removal options:
 
 ## Community
 
-- Contribution guide: CONTRIBUTING.md
-- Code of conduct: CODE_OF_CONDUCT.md
-- Security policy: SECURITY.md
+- Contribution guide: [CONTRIBUTING.md](./CONTRIBUTING.md)
+- Code of conduct: [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md)
+- Security policy: [SECURITY.md](./SECURITY.md)
 
 ## License
 
