@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=aw-tray-control
+Comment=Control ActivityWatch processes from the system tray
+Exec=aw-tray-control
+TryExec=aw-tray-control
+Icon=preferences-system-time
+Terminal=false
+Categories=Utility;System;
+StartupNotify=true

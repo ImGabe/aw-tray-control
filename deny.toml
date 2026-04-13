@@ -1,0 +1,21 @@
+[graph]
+all-features = true
+
+[advisories]
+db-urls = ["https://github.com/rustsec/advisory-db"]
+db-path = "~/.cargo/advisory-db"
+yanked = "warn"
+ignore = [
+	"RUSTSEC-2021-0139", # ansi_term via clap2 in dbus-codegen -> ksni build dependency
+	"RUSTSEC-2024-0375", # atty via clap2 in dbus-codegen -> ksni build dependency
+]
+
+[bans]
+multiple-versions = "warn"
+wildcards = "deny"
+highlight = "all"
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]

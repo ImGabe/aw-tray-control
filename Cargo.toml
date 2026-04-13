@@ -1,0 +1,23 @@
+[package]
+name = "aw-tray-control"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "System tray controller for ActivityWatch services and dashboard access."
+license = "AGPL-3.0-or-later"
+readme = "README.md"
+keywords = ["activitywatch", "tray", "linux", "productivity", "monitoring"]
+categories = ["command-line-utilities", "config"]
+
+[dependencies]
+ksni = "0.2"
+serde = { version = "1.0", features = ["derive"] }
+toml = "0.8"
+directories = "5.0"
+thiserror = "1"
+signal-hook = "0.3"
+log = "0.4"
+env_logger = "0.11"
+url = "2.5"
+nix = { version = "0.30", features = ["signal"] }
+fs2 = "0.4"
