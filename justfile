@@ -35,6 +35,10 @@ shellcheck:
 run:
   RUST_LOG=debug cargo run --
 
+# Run local diagnostics for environment and installation
+doctor:
+  ./scripts/doctor.sh
+
 # Install binary and desktop entry (requires password for sudo)
 install:
   ./scripts/reinstall-local.sh --force
@@ -46,6 +50,10 @@ check-build:
 # Build release binary
 build-release:
   cargo build --release
+
+# Install from published release tarball
+install-release version:
+  ./scripts/install-from-release.sh --version {{version}}
 
 # Clean all build artifacts
 clean:
