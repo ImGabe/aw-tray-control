@@ -103,14 +103,76 @@ process_paths = [
 
 `aw-tray-control` uses Linux tray standards (`StatusNotifierItem`/AppIndicator behavior depends on the desktop environment).
 
-| Environment | Tray support |
+Current validated environment (maintainer machine):
+
+- Desktop: GNOME on Wayland
+- GNOME Shell version: 49.5
+- AppIndicator extension: required and installed (`appindicatorsupport@rgcjonas.gmail.com`)
+
+| Environment | Tray support | Validation level | Notes |
 | --- | --- |
-| KDE Plasma | Native support |
-| X11 desktops (XFCE, Cinnamon, etc.) | Usually works out of the box |
-| GNOME (Wayland/X11) | May require AppIndicator extension |
+| GNOME (Wayland) | Works with extension | Tested | Tested on GNOME Shell 49.5; requires AppIndicator extension |
+| GNOME (X11) | Likely works with extension | Not yet tested | Same extension requirement expected |
+| KDE Plasma | Native support | Not yet tested | Should work with StatusNotifierItem |
+| X11 desktops (XFCE, Cinnamon, etc.) | Usually works out of the box | Not yet tested | Depends on tray/AppIndicator host availability |
 
 > [!IMPORTANT]
 > On GNOME, tray icons can be hidden by default. If the icon does not appear, install an AppIndicator-compatible extension (for example [AppIndicator and KStatusNotifierItem Support](https://extensions.gnome.org/extension/615/appindicator-support/)).
+
+## Troubleshooting
+
+### Tray icon does not appear on GNOME
+
+1. Confirm GNOME extension is installed:
+
+```bash
+gnome-extensions list | grep appindicatorsupport@rgcjonas.gmail.com
+```
+
+2. Install extension if missing:
+
+- https://extensions.gnome.org/extension/615/appindicator-support/
+
+3. Restart GNOME Shell session (logout/login) and run the app again.
+
+### Binary installed but command not found
+
+Ensure your user binary path is in `PATH`:
+
+```bash
+echo "$PATH" | tr ':' '\n' | grep "$HOME/.local/bin"
+```
+
+If missing, add `~/.local/bin` to your shell profile and restart the terminal.
+
+### Desktop entry exists but does not launch
+
+Regenerate launcher with explicit binary path:
+
+```bash
+./scripts/install-desktop-entry.sh --autostart --force --exec-path "$HOME/.local/bin/aw-tray-control"
+```
+
+## How to Update
+
+### Update from source
+
+```bash
+git pull
+cargo build --release
+./scripts/install-binary.sh --binary-root "$HOME/.local"
+./scripts/install-desktop-entry.sh --autostart --force --exec-path "$HOME/.local/bin/aw-tray-control"
+```
+
+### Update from release tarball
+
+```bash
+# Download latest tarball + .sha256 from GitHub Releases
+sha256sum -c aw-tray-control-<version>-x86_64-unknown-linux-gnu.tar.gz.sha256
+tar -xzf aw-tray-control-<version>-x86_64-unknown-linux-gnu.tar.gz
+install -Dm755 aw-tray-control "$HOME/.local/bin/aw-tray-control"
+./scripts/install-desktop-entry.sh --autostart --force --exec-path "$HOME/.local/bin/aw-tray-control"
+```
 
 ## Development
 
