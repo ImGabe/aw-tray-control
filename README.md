@@ -1,8 +1,15 @@
 # aw-tray-control
 
+[![CI](https://github.com/ImGabe/aw-tray-control/actions/workflows/ci.yml/badge.svg)](https://github.com/ImGabe/aw-tray-control/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/ImGabe/aw-tray-control?display_name=tag)](https://github.com/ImGabe/aw-tray-control/releases)
+[![Dependency Status](https://deps.rs/repo/github/ImGabe/aw-tray-control/status.svg)](https://deps.rs/repo/github/ImGabe/aw-tray-control)
+[![License: AGPL-3.0-or-later](https://img.shields.io/badge/license-AGPL--3.0--or--later-blue.svg)](./LICENSE)
+
 A lightweight Linux system tray controller for ActivityWatch.
 
 It starts and supervises configured ActivityWatch processes, exposes a tray menu, and gives quick access to the dashboard.
+
+![Tray menu preview](./docs/assets/tray-menu-preview.png)
 
 ## AI Transparency Notice
 
@@ -30,6 +37,13 @@ Utility entrypoint:
 ```bash
 ./scripts/utils.sh help
 ```
+
+## Installation Options
+
+- Source (recommended for development): `cargo run --bin aw-tray-control`
+- Local install to user binary dir: `./scripts/install-binary.sh --binary-root "$HOME/.local"`
+- Desktop launcher + autostart: `./scripts/install-desktop-entry.sh --autostart --force`
+- Prebuilt binaries: download from [GitHub Releases](https://github.com/ImGabe/aw-tray-control/releases)
 
 ## Releases
 
@@ -84,6 +98,19 @@ process_paths = [
   "/home/user/.cargo/bin/awatcher",
 ]
 ```
+
+## Desktop Compatibility Notes
+
+`aw-tray-control` uses Linux tray standards (`StatusNotifierItem`/AppIndicator behavior depends on the desktop environment).
+
+| Environment | Tray support |
+| --- | --- |
+| KDE Plasma | Native support |
+| X11 desktops (XFCE, Cinnamon, etc.) | Usually works out of the box |
+| GNOME (Wayland/X11) | May require AppIndicator extension |
+
+> [!IMPORTANT]
+> On GNOME, tray icons can be hidden by default. If the icon does not appear, install an AppIndicator-compatible extension (for example [AppIndicator and KStatusNotifierItem Support](https://extensions.gnome.org/extension/615/appindicator-support/)).
 
 ## Development
 
