@@ -4,10 +4,10 @@ mod notify;
 mod process;
 mod tray;
 
-use ksni::blocking::TrayMethods;
 use directories::ProjectDirs;
 use error::AppError;
 use fs2::FileExt;
+use ksni::blocking::TrayMethods;
 use std::fs::{self, OpenOptions};
 use std::sync::{
     atomic::{AtomicBool, Ordering},

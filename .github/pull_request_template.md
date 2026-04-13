@@ -47,3 +47,5 @@ Describe how this was tested.
 - [ ] Documentation updated when needed
 - [ ] No unrelated changes included
 - [ ] AI Assistance section is filled correctly
+- [ ] At least one human review was requested before merge
+- [ ] GitHub branch protection and code owner review rules are respected

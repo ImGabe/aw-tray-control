@@ -32,6 +32,10 @@ cargo test --workspace --all-targets --all-features
 - Use clear commit messages.
 - Include rationale and testing notes in PR descriptions.
 - Update docs when behavior/config changes.
+- Install the repository hooks with `just hooks` before committing.
+- The local pre-commit hook runs `cargo fmt` and `cargo clippy`.
+- The local pre-push hook blocks direct pushes to `main` and runs `cargo check` plus `cargo test`.
+- Open pull requests should go through review before merge; enable GitHub branch protection with required review from code owners.
 
 ## AI-Assisted Contributions Policy
 
