@@ -2,6 +2,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=./lib.sh
 source "${SCRIPT_DIR}/lib.sh"
 INSTALL_BINARY_SCRIPT="${SCRIPT_DIR}/install-binary.sh"
 INSTALL_DESKTOP_SCRIPT="${SCRIPT_DIR}/install-desktop-entry.sh"
